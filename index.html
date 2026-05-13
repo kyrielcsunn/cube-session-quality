@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Cube — Session Quality Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf9f7;
+    --bg-warm: #f5f3ef;
+    --surface: #ffffff;
+    --surface-alt: #f0ede8;
+    --border: #e2ddd5;
+    --border-light: #ece8e1;
+    --text: #2c2825;
+    --text-secondary: #5c5650;
+    --text-muted: #8a837b;
+    --ink: #1a1715;
+
+    --blue: #2563eb;
+    --blue-soft: #dbeafe;
+    --blue-bg: #eff6ff;
+    --purple: #7c3aed;
+    --purple-soft: #ede9fe;
+    --purple-bg: #f5f3ff;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --amber-bg: #fffbeb;
+    --green: #059669;
+    --green-soft: #d1fae5;
+    --green-bg: #ecfdf5;
+    --red: #dc2626;
+    --red-soft: #fee2e2;
+    --red-bg: #fef2f2;
+    --orange: #ea580c;
+    --orange-soft: #ffedd5;
+
+    --zone-white: #64748b;
+    --zone-yellow: #b45309;
+    --zone-purple: #7c3aed;
+
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'Instrument Sans', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 32px 80px;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    padding: 64px 0 48px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 56px;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-secondary);
+    max-width: 640px;
+    line-height: 1.65;
+  }
+  .hero-meta {
+    margin-top: 24px;
+    display: flex;
+    gap: 24px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── READING GUIDE ── */
+  .reading-guide {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 32px 36px;
+    margin-bottom: 56px;
+    position: relative;
+  }
+  .reading-guide::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--ink);
+    border-radius: 2px 0 0 2px;
+  }
+  .reading-guide p { font-size: 15px; color: var(--text-secondary); }
+  .reading-guide strong { color: var(--ink); }
+  .caveat {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: var(--amber-bg);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 2px 2px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .caveat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 4px;
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .part-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 64px 0 32px;
+  }
+  .part-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .part-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  p { margin-bottom: 12px; }
+
+  /* ── ARCHITECTURE GRID ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .arch-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 20px 22px;
+  }
+  .arch-card.span2 { grid-column: span 2; }
+  .arch-card.span3 { grid-column: span 3; }
+  .arch-card h4 {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .arch-card .count {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--ink);
+    margin-right: 4px;
+  }
+  .arch-card .unit {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .arch-card ul { list-style: none; margin-top: 10px; }
+  .arch-card li {
+    padding: 2px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .arch-card li code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--blue);
+    background: var(--blue-bg);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+  .arch-card.core {
+    border: 2px solid var(--orange);
+    background: linear-gradient(135deg, #fffbf5 0%, var(--surface) 100%);
+  }
+  .arch-card.core h4 { color: var(--orange); }
+
+  /* ── COMMON FIELDS ── */
+  .cf-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .cf-block {
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--ink);
+    border-radius: 0 0 2px 2px;
+  }
+  .cf-block h5 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .cf-num {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--ink);
+  }
+  .cf-detail {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* ── IN-SESSION COMMON ── */
+  .is-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .is-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 16px;
+  }
+  .is-block.highlight {
+    border-left: 3px solid var(--orange);
+  }
+  .is-block h5 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .is-block .fields {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--blue);
+    line-height: 2;
+  }
+  .is-block .fields .dim { color: var(--text-muted); font-family: var(--font-body); font-size: 11px; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 2px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .callout.info {
+    background: var(--blue-bg);
+    border-left: 3px solid var(--blue);
+    color: var(--text-secondary);
+  }
+  .callout.warn {
+    background: var(--amber-bg);
+    border-left: 3px solid var(--amber);
+    color: var(--text-secondary);
+  }
+  .callout-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .callout.info .callout-label { color: var(--blue); }
+  .callout.warn .callout-label { color: var(--amber); }
+  .callout code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    margin: 28px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: var(--border);
+  }
+  .tl-item {
+    position: relative;
+    padding: 14px 20px;
+    margin-bottom: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 18px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    border: 2px solid var(--bg);
+  }
+  .tl-item.core {
+    border-left: 3px solid var(--orange);
+    background: linear-gradient(135deg, #fffcf5, var(--surface));
+  }
+  .tl-item.core::before {
+    background: var(--orange);
+  }
+  .tl-phase {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .tl-item.core .tl-phase { color: var(--orange); }
+  .tl-body {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .tl-tables {
+    margin-top: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── CORE PROMISE ── */
+  .promise {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 32px 36px;
+    margin-bottom: 32px;
+  }
+  .promise h3 { margin-bottom: 12px; }
+  .vs-row {
+    display: grid;
+    grid-template-columns: 1fr 48px 1fr;
+    gap: 0;
+    align-items: stretch;
+    margin: 24px 0 16px;
+  }
+  .vs-card {
+    padding: 20px 24px;
+    border-radius: 2px;
+  }
+  .vs-card.left {
+    background: var(--bg-warm);
+    border: 1px solid var(--border);
+  }
+  .vs-card.right {
+    background: var(--ink);
+    color: #fff;
+  }
+  .vs-card .label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .vs-card.left .label { color: var(--text-muted); }
+  .vs-card.right .label { color: rgba(255,255,255,0.5); }
+  .vs-card .quote {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+  .vs-card.left .quote { color: var(--text-secondary); }
+  .vs-card.right .quote { color: #fff; }
+  .vs-card .note {
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .vs-card.left .note { color: var(--text-muted); }
+  .vs-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  /* ── ZONE RULES ── */
+  .zone-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .zone-card {
+    border-radius: 2px;
+    padding: 22px 24px;
+    border: 1px solid;
+  }
+  .zone-card.w {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+  .zone-card.y {
+    background: #fffbeb;
+    border-color: #fcd34d;
+    border-left: 4px solid var(--amber);
+  }
+  .zone-card.p {
+    background: #faf5ff;
+    border-color: #c4b5fd;
+    border-left: 4px solid var(--purple);
+  }
+  .zone-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .zone-card.w .zone-label { color: var(--zone-white); }
+  .zone-card.y .zone-label { color: var(--zone-yellow); }
+  .zone-card.p .zone-label { color: var(--zone-purple); }
+  .zone-card ul {
+    list-style: none;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .zone-card li {
+    padding: 3px 0 3px 18px;
+    position: relative;
+  }
+  .zone-card li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 11px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+  .zone-card.w li::before { background: #94a3b8; }
+  .zone-card.y li::before { background: #f59e0b; }
+  .zone-card.p li::before { background: #8b5cf6; }
+
+  /* ── PILLAR ── */
+  .pillar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .pillar-head {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pillar-num {
+    font-family: var(--font-display);
+    font-size: 36px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .pillar.p1 .pillar-num { color: var(--blue); }
+  .pillar.p2 .pillar-num { color: var(--amber); }
+  .pillar.p3 .pillar-num { color: var(--green); }
+  .pillar-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--ink);
+  }
+  .pillar-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .pillar-body {
+    padding: 28px;
+  }
+  .pillar-question {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    padding-left: 20px;
+    border-left: 3px solid var(--border);
+  }
+  .pillar.p1 .pillar-question { border-color: var(--blue); color: var(--blue); }
+  .pillar.p2 .pillar-question { border-color: var(--amber); color: var(--amber); }
+  .pillar.p3 .pillar-question { border-color: var(--green); color: var(--green); }
+
+  /* ── METRIC GROUP ── */
+  .mg-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .metric-group { margin-bottom: 24px; }
+
+  .metric-row {
+    display: grid;
+    grid-template-columns: 210px 1fr 220px;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 2px;
+    margin-bottom: 4px;
+    font-size: 13.5px;
+    transition: background 0.1s;
+  }
+  .metric-row:hover { background: var(--bg-warm); }
+  .m-name {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .m-def { color: var(--text-secondary); }
+  .m-src {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  /* ── GAP BOX ── */
+  .gap-box {
+    background: var(--red-bg);
+    border-left: 3px solid var(--red);
+    border-radius: 0 2px 2px 0;
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+  .gap-box h4 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .gap-box ul { list-style: none; }
+  .gap-box li {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    padding: 4px 0 4px 22px;
+    position: relative;
+  }
+  .gap-box li::before {
+    content: '?';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+    color: var(--red);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  /* ── DASHBOARD TABLE ── */
+  .dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 20px;
+  }
+  .dash-table thead th {
+    text-align: left;
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--ink);
+  }
+  .dash-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: top;
+  }
+  .dash-table .pursuit {
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .dash-table .pursuit.p1 { color: var(--blue); }
+  .dash-table .pursuit.p2 { color: var(--amber); }
+  .dash-table .pursuit.p3 { color: var(--green); }
+  .dash-table .red-flag { color: var(--red); font-size: 12px; }
+
+  /* ── DATA-UXR BRIDGE ── */
+  .bridge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 32px 36px;
+    margin-top: 32px;
+  }
+  .bridge-grid {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 32px;
+    margin: 20px 0;
+  }
+  .bridge-divider {
+    background: var(--border);
+  }
+  .bridge-col h4 {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .bridge-col ul {
+    list-style: none;
+    font-size: 14px;
+    line-height: 2;
+    color: var(--text-secondary);
+  }
+  .bridge-col ul strong { color: var(--ink); }
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 2px 7px;
+    border-radius: 2px;
+  }
+  .tag.data { background: var(--blue-soft); color: var(--blue); }
+  .tag.ur { background: var(--purple-soft); color: var(--purple); }
+  .tag.high { background: var(--red-soft); color: var(--red); }
+
+  .gap-table {
+    width: 100%;
+    font-size: 13px;
+    border-collapse: collapse;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .gap-table td {
+    padding: 8px 0;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .gap-table .gap-name {
+    width: 30%;
+    font-weight: 600;
+    color: var(--orange);
+  }
+  .gap-table .gap-desc { color: var(--text-secondary); }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 2px solid var(--ink);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.9;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .arch-grid, .zone-grid, .cf-row, .is-grid { grid-template-columns: 1fr; }
+    .arch-card.span2, .arch-card.span3 { grid-column: span 1; }
+    .metric-row { grid-template-columns: 1fr; }
+    .m-src { text-align: left; }
+    .vs-row { grid-template-columns: 1fr; }
+    .vs-center { display: none; }
+    .bridge-grid { grid-template-columns: 1fr; }
+    .bridge-divider { display: none; }
+    .hero h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="hero-eyebrow">The Cube &mdash; Alpha Phase</div>
+  <h1>Session Quality Framework</h1>
+  <p class="hero-sub">
+    Telemetry architecture walkthrough and session quality measurement system, derived from The Cube's core design intent &mdash; not from a generic testing template.
+  </p>
+  <div class="hero-meta">
+    <span>Working Draft</span>
+    <span>2026-05-13</span>
+    <span>86 Events &middot; 6 Log Categories</span>
+  </div>
+</div>
+
+<!-- ═══════════ READING GUIDE ═══════════ -->
+<div class="reading-guide">
+  <p><strong>Part I &mdash; Telemetry Architecture.</strong> The Cube's telemetry has 86 events across 6 categories. How do they fit together? What can each event tell us?</p>
+  <p style="margin-bottom:0;"><strong>Part II &mdash; Session Quality Framework.</strong> What does a "good session" mean for The Cube? Three core pursuits &rarr; 15 measurable indicators &rarr; telemetry mapping &rarr; UXR gaps.</p>
+  <div class="caveat">
+    <div class="caveat-label">Caveat</div>
+    All "healthy ranges" are hypothetical. No build has been played. This framework is stable in structure but needs calibration after the first test round.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- ═══════════ PART I ═══════════════════ -->
+<!-- ═══════════════════════════════════════ -->
+<div class="part-divider">
+  <span class="part-label">Part I</span>
+  <div class="part-line"></div>
+</div>
+
+<h2>Telemetry Architecture</h2>
+<p class="section-desc">86 events &middot; 6 log categories &middot; 31 common fields &middot; 28 in-session common fields</p>
+
+<!-- 6 Categories -->
+<div class="arch-grid">
+  <div class="arch-card">
+    <h4>1) Client Logs</h4>
+    <span class="count">3</span><span class="unit">events</span>
+    <ul>
+      <li><code>ClientClick</code> &mdash; 28-step launch funnel</li>
+      <li><code>ClientCrash</code> &mdash; crash + perf snapshot</li>
+      <li><code>Tutorial</code> &mdash; onboarding steps</li>
+    </ul>
+  </div>
+  <div class="arch-card">
+    <h4>2) Basic Logs</h4>
+    <span class="count">6</span><span class="unit">events</span>
+    <ul>
+      <li><code>PlayerRegister</code> / <code>Login</code> / <code>Logout</code></li>
+      <li><code>OnlineCnt</code> &mdash; per-minute CCU</li>
+      <li><code>ClientLogin</code> / <code>ClientLogout</code></li>
+    </ul>
+  </div>
+  <div class="arch-card">
+    <h4>5) Resource Growth</h4>
+    <span class="count">5</span><span class="unit">events</span>
+    <ul>
+      <li><code>ItemAdd/Remove</code> &mdash; dual-source attribution</li>
+      <li><code>PlayerLevelUp</code> / <code>WeaponLevelUp</code> / <code>SystemLevelUp</code></li>
+    </ul>
+  </div>
+  <div class="arch-card span2">
+    <h4>3) Gameplay Behaviour Logs</h4>
+    <span class="count">37</span><span class="unit">events &middot; Out-of-Session (Vine + Personal Hub)</span>
+    <ul style="columns: 2;">
+      <li><code>QuestEvent</code> &mdash; quest/contract lifecycle</li>
+      <li><code>ShopBuy/Sell</code> &mdash; NPC shop</li>
+      <li><code>TradingList/Delist/Buy</code> &mdash; player market</li>
+      <li><code>AbilityPoint/Reset</code> &mdash; skill tree</li>
+      <li><code>craftingStep/Complete</code> &mdash; 5-step Top Tier</li>
+      <li><code>ModuleBuild/Deconstruct</code> &mdash; base</li>
+      <li><code>pikasAcquire/Feeding</code> &mdash; Pika lifecycle</li>
+      <li><code>HydroponicsPlant/Harvest</code> &mdash; farming</li>
+      <li><code>PikaGemProduce/PikaDeath</code> &mdash; gems</li>
+      <li><code>WeaponAttachments/Exercise</code> &mdash; weapons</li>
+      <li><code>Gachapon</code> / <code>ArmorBreakdown</code></li>
+      <li><code>Terrarium/HydroponicsEnvAdjust</code></li>
+    </ul>
+  </div>
+  <div class="arch-card">
+    <h4>6) Social Logs</h4>
+    <span class="count">7</span><span class="unit">events</span>
+    <ul>
+      <li><code>ClanCreation/MemberOp/Trade</code></li>
+      <li><code>FriendsOp/Events/TeamUp</code></li>
+      <li><code>rank</code> &mdash; daily leaderboard snapshot</li>
+    </ul>
+  </div>
+  <div class="arch-card span3 core">
+    <h4>4) In-Session Logs &mdash; Alpha Core</h4>
+    <span class="count">28</span><span class="unit">events &middot; Everything inside the Cube</span>
+    <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 0;">Primary data source for Alpha Session Quality. Almost all events are <span class="tag high">HIGH</span> priority.</p>
+  </div>
+</div>
+
+<!-- Common Fields -->
+<h3 style="margin-top: 36px;">Common Fields</h3>
+<p class="section-desc">Every event carries these 31 fields. They are the "slice dimensions" for all analysis.</p>
+<div class="cf-row">
+  <div class="cf-block"><h5>LaunchCore</h5><div class="cf-num">6</div><div class="cf-detail">timestamp, launch_id, session_id, server_id, player_id, login_channel</div></div>
+  <div class="cf-block"><h5>ClientInfo</h5><div class="cf-num">10</div><div class="cf-detail">build_version, platform, OS, store, language, environment, device_id, country&hellip;</div></div>
+  <div class="cf-block"><h5>Network</h5><div class="cf-num">2</div><div class="cf-detail">client_ip, ISP</div></div>
+  <div class="cf-block"><h5>Hardware</h5><div class="cf-num">10</div><div class="cf-detail">display, CPU, RAM, VRAM, GPU, driver, disk&hellip;</div></div>
+  <div class="cf-block"><h5>PlayerGame</h5><div class="cf-num">3</div><div class="cf-detail">player_level, stash_total_value, currency_info_list</div></div>
+</div>
+
+<!-- In-Session Common -->
+<h3 style="margin-top: 32px;">In-Session Common Fields</h3>
+<p class="section-desc">28 additional fields on all in-session events. These make Cube-specific spatial analysis possible.</p>
+<div class="is-grid">
+  <div class="is-block highlight">
+    <h5>Cube Spatial</h5>
+    <div class="fields">
+      s_cube_id <span class="dim">(face 1-6)</span><br>
+      s_till_id <span class="dim">(24 tiles)</span><br>
+      s_till_type <span class="dim">(biome)</span><br>
+      s_poi_id<br>
+      <strong>s_risk_zone</strong> <span class="dim">(W / Y / P)</span><br>
+      b_is_indoor
+    </div>
+  </div>
+  <div class="is-block">
+    <h5>Social / Team</h5>
+    <div class="fields">
+      s_party_id + members<br>
+      <span class="dim">(pre-match squad)</span><br>
+      s_team_id + members<br>
+      <span class="dim">(in-session team)</span>
+    </div>
+  </div>
+  <div class="is-block">
+    <h5>Combat Power</h5>
+    <div class="fields">
+      i_elo / i_group_elo<br>
+      i_loadout_value<br>
+      i_battle_value<br>
+      s_player_attribute
+    </div>
+  </div>
+  <div class="is-block">
+    <h5>Server Context</h5>
+    <div class="fields">
+      s_mode <span class="dim">(pve/pvp/raids)</span><br>
+      s_difficulty<br>
+      s_map_name<br>
+      s_server_session_id<br>
+      s_region
+    </div>
+  </div>
+</div>
+
+<div class="callout info">
+  <div class="callout-label">Key Insight for UXR</div>
+  <code>s_cube_id</code>, <code>s_till_id</code>, and <code>s_risk_zone</code> appear in every in-session event. <strong>Every kill, death, loot, and combat action can be sliced by Cube face, tile, and risk zone</strong> &mdash; the data infrastructure for Cube Rotation analysis already exists.
+</div>
+
+<!-- Session Timeline -->
+<h3 style="margin-top: 36px;">A Session's Data Flow</h3>
+<div class="timeline">
+  <div class="tl-item">
+    <div class="tl-phase">Matchmaking</div>
+    <div class="tl-body">Player initiates matchmaking with loadout, party, ELO</div>
+    <div class="tl-tables">matchmakingStart &rarr; matchmakingEnd (result + duration + fail reason)</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-phase">Deploy</div>
+    <div class="tl-body">Full "entry snapshot": loadout (every weapon + attachment + gear with unique_id), backpack, accepted quests, game settings, skins</div>
+    <div class="tl-tables">playerDeploy &mdash; the richest single event in the system</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-phase">Parachute</div>
+    <div class="tl-body">Start position &rarr; landing position + flight distance + duration</div>
+    <div class="tl-tables">playerParachuteStart &rarr; playerParachuteDown</div>
+  </div>
+  <div class="tl-item core">
+    <div class="tl-phase">In-Session Loop &mdash; 10s heartbeat + event-driven</div>
+    <div class="tl-body">
+      <strong>playerPosition</strong> every 10s: location, orientation, backpack value, team distance, quest progress, <strong>FPS percentiles (25p/50p/75p/95p/99p)</strong>, <strong>Ping percentiles</strong>, packet loss, player state<br><br>
+      <strong>playerReceivedDamage</strong> every 10s: damage breakdown, source (PvE/Boss/Player), FPS/Ping snapshot, both sides' full gear + stats<br><br>
+      <strong>cubeRotation</strong>: rotation reason, before/after tile layout, risk zone changes, affected player count<br><br>
+      Combat: skillUse, isDown, death (full killer info + loss value), revived, heal, shieldRestore<br>
+      Loot: combatItemAdded/Removed (item_unique_id tracking + source attribution)<br>
+      Boss/PvE: bossEventStats, PveEnermyBattleStats (per-player DPS/heal/skill breakdown)<br>
+      World: worldEventOccurred (type, severity 1-5, trigger reason incl. cube_rotation)
+    </div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-phase">Exit / Settlement</div>
+    <div class="tl-body">
+      <strong>playerLeaveServer</strong>: leave reason, duration, distance, backpack value, loadout,
+      <strong>risk zone duration JSON</strong> (seconds per W/Y/P),
+      POI count, Cube face count, Tile count,
+      kills/deaths/encounters per risk zone,
+      completed quests, extraction point ID, loss breakdown
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- ═══════════ PART II ══════════════════ -->
+<!-- ═══════════════════════════════════════ -->
+<div class="part-divider">
+  <span class="part-label">Part II</span>
+  <div class="part-line"></div>
+</div>
+
+<h2>Session Quality Framework</h2>
+<p class="section-desc">Derived from The Cube's core design intent.</p>
+
+<!-- Core Promise -->
+<div class="promise">
+  <h3>The Logic: Core Promise &rarr; Session Quality</h3>
+  <p style="font-size: 14px; color: var(--text-secondary);">A good SQ framework answers: "This game promises X. Did this session deliver X?"</p>
+  <div class="vs-row">
+    <div class="vs-card left">
+      <div class="label">Typical Extraction Shooter</div>
+      <div class="quote">"Survive and loot out."</div>
+      <div class="note">One-dimensional tension &rarr; SQ = extraction rate + loot ROI</div>
+    </div>
+    <div class="vs-center">vs.</div>
+    <div class="vs-card right">
+      <div class="label">The Cube's Promise</div>
+      <div class="quote">"In a world that keeps changing, choose your own risk, leave with purpose, and make your persistent world better."</div>
+    </div>
+  </div>
+  <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 0;">This promise decomposes into <strong style="color: var(--ink);">three core pursuits</strong> that define session quality:</p>
+</div>
+
+<!-- Zone Rules -->
+<h3>Risk Zone Rules</h3>
+<p class="section-desc">The three-tier risk system is the backbone of player agency in The Cube.</p>
+<div class="zone-grid">
+  <div class="zone-card w">
+    <div class="zone-label">White &mdash; Top Face</div>
+    <ul>
+      <li>No PvP allowed</li>
+      <li>PvE only, lower-tier enemies</li>
+      <li>Lowest loot value</li>
+      <li>Safe learning ground</li>
+    </ul>
+  </div>
+  <div class="zone-card y">
+    <div class="zone-label">Yellow &mdash; Four Sides</div>
+    <ul>
+      <li>PvP allowed</li>
+      <li>Respawn available on death</li>
+      <li>Partial gear loss on death</li>
+      <li>Balanced risk-reward</li>
+    </ul>
+  </div>
+  <div class="zone-card p">
+    <div class="zone-label">Purple &mdash; Bottom Face</div>
+    <ul>
+      <li>PvP &mdash; full exposure</li>
+      <li>No respawn</li>
+      <li>Full gear loss on death</li>
+      <li>Highest loot + top-tier Bosses</li>
+    </ul>
+  </div>
+</div>
+<div class="callout warn">
+  <div class="callout-label">Purple Zone Paradox</div>
+  Design claims "risk is optional." But top-tier Bosses only spawn in Purple &rarr; progression-driven players are <em>functionally forced</em> into the highest-risk zone. Whether this feels like agency or coercion is a P0 validation question.
+</div>
+
+<!-- ── PILLAR 1 ── -->
+<div class="pillar p1" style="margin-top: 36px;">
+  <div class="pillar-head">
+    <div class="pillar-num">1</div>
+    <div>
+      <div class="pillar-title">Dynamic Stakes</div>
+      <div class="pillar-subtitle">Is this session's world alive and different from the last one?</div>
+    </div>
+  </div>
+  <div class="pillar-body">
+    <div class="pillar-question">"Every session should feel like a new situation, not a repeated route."</div>
+    <div class="metric-group">
+      <div class="mg-title">A &mdash; Cube Rotation Experience</div>
+      <div class="metric-row"><div class="m-name">A1. Rotation Exposure</div><div class="m-def">% of sessions where player experienced &ge;1 rotation</div><div class="m-src">cubeRotation per deployment_id</div></div>
+      <div class="metric-row"><div class="m-name">A2. Behavioral Impact</div><div class="m-def">Movement change within 60s post-rotation vs. 60s pre-rotation</div><div class="m-src">playerPosition diff around cubeRotation</div></div>
+      <div class="metric-row"><div class="m-name">A3. Risk Reset Rate</div><div class="m-def">% of players whose risk_zone changed due to rotation (not movement)</div><div class="m-src">cubeRotation.risk_zone_changes</div></div>
+    </div>
+    <div class="metric-group">
+      <div class="mg-title">B &mdash; Emergent Encounter Diversity</div>
+      <div class="metric-row"><div class="m-name">B1. Encounter Diversity</div><div class="m-def">Distinct encounter types per session (PvE / Boss / PvP / World Event / Arena)</div><div class="m-src">battle + death + worldEvent + arena</div></div>
+      <div class="metric-row"><div class="m-name">B2. PvP Density by Zone</div><div class="m-def">Player encounters per minute in each risk zone</div><div class="m-src">playerLeaveServer.s_player_encounter</div></div>
+      <div class="metric-row"><div class="m-name">B3. World Event Participation</div><div class="m-def">% of sessions overlapping a world event &times; behavioral change during</div><div class="m-src">worldEventOccurred</div></div>
+    </div>
+    <div class="gap-box">
+      <h4>Only UXR Can Answer</h4>
+      <ul>
+        <li>Did the player <em>notice</em> the rotation? <em>Understand</em> what changed? Did it <em>change their plan</em>?</li>
+        <li>Did encounters feel "emergent and exciting" or "random and unfair"?</li>
+        <li>After rotation moved them from Yellow to Purple &mdash; opportunity or punishment?</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── PILLAR 2 ── -->
+<div class="pillar p2">
+  <div class="pillar-head">
+    <div class="pillar-num">2</div>
+    <div>
+      <div class="pillar-title">Risk-Choice Agency</div>
+      <div class="pillar-subtitle">Is the player choosing risk, or being chosen by risk?</div>
+    </div>
+  </div>
+  <div class="pillar-body">
+    <div class="pillar-question">"I decide how much danger I want. Higher risk is more rewarding, but never forced."</div>
+    <div class="metric-group">
+      <div class="mg-title">C &mdash; Risk Selection Behavior</div>
+      <div class="metric-row"><div class="m-name">C1. Zone Time Split</div><div class="m-def">% of session time in White : Yellow : Purple</div><div class="m-src">playerLeaveServer.s_risk_zone_duration</div></div>
+      <div class="metric-row"><div class="m-name">C2. Risk-Reward Gradient</div><div class="m-def">Loot value per minute, by risk zone</div><div class="m-src">combatItemAdded.i_item_value &times; risk_zone</div></div>
+      <div class="metric-row"><div class="m-name">C3. Voluntary vs. Forced</div><div class="m-def">% of zone upgrades by player movement vs. rotation pushing them</div><div class="m-src">playerPosition vs. cubeRotation.risk_zone_changes</div></div>
+      <div class="metric-row"><div class="m-name">C4. Purple Penetration &times; Survival</div><div class="m-def">% sessions entering purple &times; extraction rate from purple</div><div class="m-src">risk_zone=purple + leave_reason</div></div>
+    </div>
+    <div class="metric-group">
+      <div class="mg-title">D &mdash; Death Cost & Gear Fear</div>
+      <div class="metric-row"><div class="m-name">D1. Death Loss Distribution</div><div class="m-def">Percentile distribution of total_loss_value on death</div><div class="m-src">playerDeath.f_total_loss_value</div></div>
+      <div class="metric-row"><div class="m-name">D2. Post-Death Behavior</div><div class="m-def">After death: re-queue vs. Vine vs. logout &mdash; and time to next action</div><div class="m-src">playerDeath &rarr; next matchmakingStart</div></div>
+      <div class="metric-row"><div class="m-name">D3. Gear Fear Index</div><div class="m-def">Trend of loadout_value across consecutive deploys per player</div><div class="m-src">playerDeploy.i_loadout_value sequence</div></div>
+    </div>
+    <div class="gap-box">
+      <h4>Only UXR Can Answer</h4>
+      <ul>
+        <li>"Did you <em>want</em> to go to Purple, or feel you <em>had to</em>?"</li>
+        <li>"When you died, was it <em>your mistake</em> or <em>unfair</em>?"</li>
+        <li>"After losing gear, did you want to try again or stop playing?"</li>
+        <li>Distinguish risk aversion by choice (healthy) vs. by confusion (design problem)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── PILLAR 3 ── -->
+<div class="pillar p3">
+  <div class="pillar-head">
+    <div class="pillar-num">3</div>
+    <div>
+      <div class="pillar-title">Purposeful Extraction</div>
+      <div class="pillar-subtitle">Is the player leaving with intent, or fleeing in panic?</div>
+    </div>
+  </div>
+  <div class="pillar-body">
+    <div class="pillar-question">"The key moment is not just WHEN to leave &mdash; but WHY you choose to leave." &mdash; R&amp;D</div>
+    <p style="font-size: 14px; color: var(--text-secondary);">Unlike typical extraction shooters where SQ &asymp; extraction rate + loot ROI, The Cube adds a <strong style="color: var(--ink);">purpose layer</strong>: players should extract not just to preserve loot but to advance their persistent world. A panic extraction with trash loot is <em>not</em> higher quality than a death after completing a high-value contract &mdash; it depends on whether the session had <em>purpose</em>.</p>
+    <div class="metric-group">
+      <div class="mg-title">E &mdash; Extraction Quality</div>
+      <div class="metric-row"><div class="m-name">E1. Extraction Rate</div><div class="m-def">extraction / total sessions (baseline)</div><div class="m-src">playerLeaveServer.leave_reason</div></div>
+      <div class="metric-row"><div class="m-name">E2. Loot ROI</div><div class="m-def">(exit backpack_value &minus; entry backpack_value) / entry loadout_value</div><div class="m-src">playerLeaveServer &minus; playerDeploy</div></div>
+      <div class="metric-row"><div class="m-name">E3. Intentional Exit Rate</div><div class="m-def">% exits that are extraction (proactive) vs. death/disconnect/quit (reactive)</div><div class="m-src">playerLeaveServer.leave_reason</div></div>
+      <div class="metric-row"><div class="m-name">E4. Contract-Driven Rate</div><div class="m-def">% sessions with &ge;1 accepted contract at entry</div><div class="m-src">playerDeploy.s_mission_status</div></div>
+      <div class="metric-row"><div class="m-name">E5. Contract Completion</div><div class="m-def">Of contract-driven sessions, % that completed &ge;1 contract</div><div class="m-src">playerLeaveServer.s_mission_finished</div></div>
+    </div>
+    <div class="metric-group">
+      <div class="mg-title">F &mdash; Session Rhythm</div>
+      <div class="metric-row"><div class="m-name">F1. Duration Distribution</div><div class="m-def">Percentile distribution of session length (find natural rhythm)</div><div class="m-src">playerLeaveServer.i_duration</div></div>
+      <div class="metric-row"><div class="m-name">F2. Exploration Breadth</div><div class="m-def">Tiles &times; POIs &times; Cube faces visited</div><div class="m-src">playerLeaveServer: till/poi/cube_num</div></div>
+      <div class="metric-row"><div class="m-name">F3. Re-Queue Momentum</div><div class="m-def">Time to next matchmaking by exit type (extraction vs. death vs. quit)</div><div class="m-src">playerLeaveServer &rarr; next matchmakingStart</div></div>
+    </div>
+    <div class="gap-box">
+      <h4>Only UXR Can Answer</h4>
+      <ul>
+        <li>"Why did you extract at that moment?" (loot full? contract done? scared? bored?)</li>
+        <li>"Did you go in with a plan? Did you accomplish it?"</li>
+        <li>"After extracting, did you know what to do with your loot?" (purpose clarity)</li>
+        <li>"Would you call this session successful? Why?" (subjective vs. data quality)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ── DASHBOARD TABLE ── -->
+<h3 style="margin-top: 40px;">Session Quality Dashboard</h3>
+<p class="section-desc">One-page view &mdash; did this session deliver on The Cube's core promise?</p>
+<div style="overflow-x: auto;">
+  <table class="dash-table">
+    <thead>
+      <tr>
+        <th>Core Pursuit</th>
+        <th>Key Metric</th>
+        <th>Hypothetical Healthy Range</th>
+        <th>Red Flag</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="pursuit p1" rowspan="3">1. Dynamic Stakes</td><td>A1 Rotation Exposure</td><td>&gt;60% sessions experience rotation</td><td class="red-flag">&lt;30% &rarr; core differentiator invisible</td></tr>
+      <tr><td>A2 Behavioral Impact</td><td>&gt;30% players change movement post-rotation</td><td class="red-flag">No change &rarr; decorative only</td></tr>
+      <tr><td>B1 Encounter Diversity</td><td>&ge;2 types per session</td><td class="red-flag">1 type &rarr; monotone, not "emergent"</td></tr>
+      <tr><td class="pursuit p2" rowspan="3">2. Risk-Choice Agency</td><td>C1 Zone Time Split</td><td>Trapezoid: W&gt;Y&gt;P, but P&gt;5%</td><td class="red-flag">P=0% or W=95% &rarr; gradient broken</td></tr>
+      <tr><td>C3 Voluntary Escalation</td><td>&gt;50% zone upgrades are voluntary</td><td class="red-flag">Mostly forced by rotation &rarr; no agency</td></tr>
+      <tr><td>D3 Gear Fear Index</td><td>Loadout value stable/rising across sessions</td><td class="red-flag">Declining &rarr; death cost too punishing</td></tr>
+      <tr><td class="pursuit p3" rowspan="3">3. Purposeful Extraction</td><td>E1 Extraction Rate</td><td>30&ndash;45%</td><td class="red-flag">&lt;15% too deadly &middot; &gt;70% no tension</td></tr>
+      <tr><td>E3 Intentional Exit Rate</td><td>&gt;50% proactive exits</td><td class="red-flag">&gt;80% deaths &rarr; no extraction agency</td></tr>
+      <tr><td>F3 Re-Queue Momentum</td><td>&lt;5min to next session after extraction</td><td class="red-flag">Long gap after death &rarr; frustration</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── DATA-UXR BRIDGE ── -->
+<h3 style="margin-top: 44px;">The Data&ndash;UXR Bridge</h3>
+<p class="section-desc">What telemetry can see vs. what only user research can reveal.</p>
+<div class="bridge">
+  <div class="bridge-grid">
+    <div class="bridge-col">
+      <h4 style="color: var(--blue);"><span class="tag data">DATA</span> Can Measure</h4>
+      <ul>
+        <li><strong>What</strong> happened &mdash; actions, sequences, frequencies</li>
+        <li><strong>How many</strong> &mdash; distributions, rates, proportions</li>
+        <li><strong>When &amp; where</strong> &mdash; timestamps, coordinates, zones</li>
+        <li><strong>Correlations</strong> &mdash; FPS&times;death, zone&times;loot, loadout&times;survival</li>
+      </ul>
+    </div>
+    <div class="bridge-divider"></div>
+    <div class="bridge-col">
+      <h4 style="color: var(--purple);"><span class="tag ur">UXR</span> Must Answer</h4>
+      <ul>
+        <li><strong>Why</strong> &mdash; motivation, decision rationale</li>
+        <li><strong>How it felt</strong> &mdash; tension, fairness, satisfaction</li>
+        <li><strong>Understanding</strong> &mdash; did they get the mechanic?</li>
+        <li><strong>Intent</strong> &mdash; voluntary vs. forced, planned vs. reactive</li>
+      </ul>
+    </div>
+  </div>
+  <table class="gap-table">
+    <tr><td colspan="2" style="padding-bottom: 12px;"><strong style="color: var(--ink);">The 5 Critical Gaps for Alpha</strong></td></tr>
+    <tr><td class="gap-name">Cube Rotation Comprehension</td><td class="gap-desc">Data sees behavioral change. Only UXR distinguishes <em>perceived &rarr; understood &rarr; influenced decision</em>.</td></tr>
+    <tr><td class="gap-name">Purple Zone Agency</td><td class="gap-desc">Data sees who enters purple. Only UXR tells "I chose to" from "I had to" for progression.</td></tr>
+    <tr><td class="gap-name">Extraction Motivation</td><td class="gap-desc">Same extraction rate, different meaning: "I got what I came for" vs. "I'm about to die."</td></tr>
+    <tr><td class="gap-name">PvP Encounter Intent</td><td class="gap-desc">Same event. "I wanted that fight" vs. "I was ambushed" produce opposite experiences.</td></tr>
+    <tr><td class="gap-name">Death Attribution</td><td class="gap-desc">Same death. "My mistake, I'll learn" retains. "Unfair, the game cheated" churns.</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<div class="footer">
+  The Cube Session Quality Framework &middot; Working Draft 2026-05-13<br>
+  Telemetry: The Cube Telemetry Design Proposal 0513.xlsx (86 events, 8 sheets)<br>
+  Design: GDD + CoreGameplayLoop R&D Supplement + M1 Scope
+</div>
+
+</div><!-- /.page -->
+</body>
+</html>
